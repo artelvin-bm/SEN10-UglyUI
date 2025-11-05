@@ -3,4 +3,4 @@ function greet() {
 }
 
 // No semicolon here
-greet()
+greet();
