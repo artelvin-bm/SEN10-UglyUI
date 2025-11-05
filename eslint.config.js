@@ -3,18 +3,26 @@ const js = require("@eslint/js");
 module.exports = [
   js.configs.recommended,
   {
-    files: ["**/*.js"],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "script",
       globals: {
-        window: "readonly",
-        document: "readonly",
-        console: "readonly",
+        // Node globals
+        require: true,
+        module: true,
+
+        // Browser globals
+        window: true,
+        document: true,
+        Audio: true,
+
+        // Jest testing globals
+        test: true,
+        expect: true,
       },
     },
     rules: {
-      semi: ["error", "always"], // require semicolons
+      semi: ["error", "always"],
+      quotes: ["error", "double"],
+      "no-unused-vars": ["warn"],
     },
   },
 ];
