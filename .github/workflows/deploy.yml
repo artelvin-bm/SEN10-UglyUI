@@ -1,35 +1,41 @@
-name: Lint and Deploy Static Site
+name: Lint, Test, and Deploy Static Site
 
 on:
   push:
-    branches: [ main ]
+    branches: [ module13-quiz ]
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Install ESLint (v9) and dependencies
-        run: |
-          npm install eslint @eslint/js
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm test
 
-      - name: Run ESLint
-        run: npx eslint script.js
-
-      - name: Deploy to GitHub Pages
-        if: success()
-        uses: peaceiris/actions-gh-pages@v3
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ needs.test.result == 'success' && needs.lint.result == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
